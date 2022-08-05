@@ -3,6 +3,8 @@ title: First post
 slug: first-post
 ---
 
-this is an exceprt
+# First Post for real
 
-<h1>First Post</h1>
+- milk
+- water
+- eggs

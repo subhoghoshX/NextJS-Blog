@@ -1,6 +1,10 @@
 import fs from "fs";
 import matter from "gray-matter";
 import path from "path";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkHtml from "remark-html";
+import Head from "next/head";
 
 interface Props {
   postData: {
@@ -12,13 +16,19 @@ interface Props {
     isEmpty: boolean;
     excerpt: string;
   };
+  innerContent: string;
 }
 
-export default function Post({ postData }: Props) {
+export default function Post({ postData, innerContent }: Props) {
   return (
-    <div>
-      <h1 className="text-5xl text-gray-900">{postData.data.title}</h1>
-      <p>{postData.content}</p>
+    <div className="prose">
+      <Head>
+        <title>{postData.data.title}</title>
+      </Head>
+      <div
+        className="prose"
+        dangerouslySetInnerHTML={{ __html: innerContent }}
+      ></div>
     </div>
   );
 }
@@ -49,10 +59,16 @@ export async function getStaticProps({ params: { slug } }: any) {
 
   const postData = matter(str, { excerpt: true });
 
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkHtml)
+    .process(postData.content);
+
   return {
     props: {
       slug,
       postData,
+      innerContent: String(file),
     },
   };
 }
